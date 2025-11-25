@@ -27,7 +27,7 @@ end
 VERSION = {
     Check = function(err, response, headers)
         local resourceName = GetCurrentResourceName()
-        local currentVersion = GetResourceMetadata(resourceName, "legacyversion", 0)
+        local currentVersion = GetResourceMetadata(resourceName, "version", 0)
         if not currentVersion then return end
 
         local manifestURL = HUD.VersionCheckBaseURL .. resourceName .. "/fxmanifest.lua"
@@ -38,7 +38,7 @@ VERSION = {
             return
         end
 
-        local remoteVersion = response:match("version%s+'([%d%.]+)'")
+        local remoteVersion = response:match('version%s*["\']([%d%.]+)["\']')
         if not remoteVersion then
             HUD:ErrorHandle(Translate("errorGetRemoteVersion"))
             return
