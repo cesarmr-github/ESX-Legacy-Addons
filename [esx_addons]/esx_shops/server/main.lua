@@ -13,7 +13,22 @@ function GetItemFromShop(itemName, zone)
 		return false
 	end
 
-	return true,item.price, item.label
+	return true, item.price, item.label
+end
+
+function IsPlayerInZone(source, zone)
+	local maxDist = 5.0
+	local playerPed = GetPlayerPed(source)
+	local playerPos = GetEntityCoords(playerPed)
+	if not Config.Zones[zone] or not Config.Zones[zone].Pos then
+		return false
+	end
+	for _, pos in ipairs(Config.Zones[zone].Pos) do
+		if #(playerPos - pos) <= maxDist then
+			return true
+		end
+	end
+	return false
 end
 
 RegisterServerEvent('esx_shops:buyItem')
@@ -23,6 +38,11 @@ AddEventHandler('esx_shops:buyItem', function(itemName, amount, zone)
 	local Exists, price, label = GetItemFromShop(itemName, zone)
 	amount = ESX.Math.Round(amount)
 
+	-- Validate player distance to shop
+	if not IsPlayerInZone(source, zone) then
+		print(('[^3WARNING^7] Player ^5%s^7 attempted to buy from shop out of range!'):format(source))
+		return
+	end
 	if amount < 0 then
 		print(('[^3WARNING^7] Player ^5%s^7 attempted to exploit the shop!'):format(source))
 		return
